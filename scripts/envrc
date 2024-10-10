@@ -4,6 +4,8 @@ export DB_DSN="$DB_PATH?_txlock=immediate"
 
 # replication
 export REPLICA_URL="s3://referrals.localhost:9000/db"
+export LITESTREAM_ACCESS_KEY_ID=minioadmin
+export LITESTREAM_SECRET_ACCESS_KEY=minioadmin
 
 # gin
 export DISABLE_COLOR=1
