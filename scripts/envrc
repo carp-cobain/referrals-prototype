@@ -1,0 +1,11 @@
+# database
+export DB_PATH="referrals.db"
+export DB_DSN="$DB_PATH?_txlock=immediate"
+
+# replication
+export REPLICA_URL="s3://referrals.localhost:9000/db"
+
+# gin
+export DISABLE_COLOR=1
+export GIN_MODE=release
+export PORT=8080
