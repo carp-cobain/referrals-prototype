@@ -9,7 +9,7 @@ A prototype web-service created to explore capturing signups for referral campai
 Run a local minio server in docker
 
 ```sh
-docker run -d --name minio-server -v "$(pwd)"/data:/data/ -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"'
+docker run -d --name minio-server -v "$(pwd)"/data:/data/ -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"
 ```
 
 Go to http://localhost:9001/login
