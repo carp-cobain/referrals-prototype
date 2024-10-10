@@ -4,7 +4,9 @@ A prototype web-service created to explore capturing signups for referral campai
 
 **Replication setup**
 
-Assumes a local minio server is running in docker
+[Install](https://litestream.io/install/) litestream
+
+Run a local minio server in docker
 
 ```sh
 docker run -d --name minio-server -v "$(pwd)"/data:/data/ -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"'
