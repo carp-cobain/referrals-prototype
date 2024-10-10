@@ -62,8 +62,7 @@ func setPragmas(db *gorm.DB) error {
 		"cache_size = 1000000000",
 		"foreign_keys = true",
 		"temp_store = memory",
-		"wal_autocheckpoint = 1000",
-		"wal_checkpoint(TRUNCATE)",
+		"wal_autocheckpoint = 0",
 	}
 	for _, stmt := range stmts {
 		if err := db.Exec(fmt.Sprintf("PRAGMA %s;", stmt)).Error; err != nil {
