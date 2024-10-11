@@ -11,3 +11,8 @@ export LITESTREAM_SECRET_ACCESS_KEY=minioadmin
 export DISABLE_COLOR=1
 export GIN_MODE=release
 export PORT=8080
+
+# signup redirect
+export SIGNUP_URL="https://myapp.io/signup"
+export SIGNUP_COOKIE_PATH="/signup"
+export SIGNUP_COOKIE_DOMAIN="myapp.io"
