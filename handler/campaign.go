@@ -12,7 +12,7 @@ import (
 )
 
 // CookieName is the name for referral campaign cookies
-var CookieName string = "c-referrer"
+var CookieName string = "ReferralCampaign"
 
 // MaxAge is the max age for referral campaign cookies
 var MaxAge int = 30 * 24 * 60 * 60
