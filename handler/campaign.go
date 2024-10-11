@@ -2,20 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-	"os"
 	"strings"
 
 	"github.com/carp-cobain/referrals/keeper"
 	"github.com/gin-gonic/gin"
 )
-
-// CookieName is the name for referral campaign cookies
-var CookieName string = "ReferralCampaign"
-
-// MaxAge is the max age for referral campaign cookies
-var MaxAge int = 30 * 24 * 60 * 60
 
 // CampaignHandler is the http/json api for managing referral campaigns
 type CampaignHandler struct {
@@ -25,21 +16,6 @@ type CampaignHandler struct {
 // NewCampaignHandler creates a new referral campaign handler
 func NewCampaignHandler(campaignKeeper keeper.CampaignKeeper) CampaignHandler {
 	return CampaignHandler{campaignKeeper}
-}
-
-// GET /referrals/:id/signup
-// CampaignSignupRedirect drops a cookie and redirects the requestor to a signup URL.
-func (self CampaignHandler) CampaignSignupRedirect(c *gin.Context) {
-	location, path, domain := lookupSignupEnv()
-	id, err := uintParam(c, "id")
-	if err != nil {
-		c.Redirect(http.StatusFound, location)
-		return
-	}
-	if campaign, err := self.campaignKeeper.GetCampaign(id); err == nil {
-		c.SetCookie(CookieName, fmt.Sprintf("%d", campaign.ID), MaxAge, path, domain, false, false)
-	}
-	c.Redirect(http.StatusFound, location)
 }
 
 // GET /campaigns
@@ -111,21 +87,4 @@ func (self CampaignRequest) Validate() (string, string, error) {
 		return "", "", fmt.Errorf("address must have prefix: tp")
 	}
 	return address, strings.TrimSpace(self.Name), nil
-}
-
-// Lookup signup redirect info from env var
-func lookupSignupEnv() (string, string, string) {
-	url, ok := os.LookupEnv("SIGNUP_URL")
-	if !ok {
-		log.Panicf("SIGNUP_URL not defined")
-	}
-	path, ok := os.LookupEnv("SIGNUP_COOKIE_PATH")
-	if !ok {
-		log.Panicf("SIGNUP_COOKIE_PATH not defined")
-	}
-	domain, ok := os.LookupEnv("SIGNUP_COOKIE_DOMAIN")
-	if !ok {
-		log.Panicf("SIGNUP_COOKIE_DOMAIN not defined")
-	}
-	return url, path, domain
 }

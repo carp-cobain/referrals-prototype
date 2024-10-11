@@ -24,13 +24,14 @@ func main() {
 	signupRepo := repo.NewSignupRepo(readDB, writeDB)
 
 	campaignHandler := handler.NewCampaignHandler(campaignRepo)
+	redirectHandler := handler.NewRedirectHandler(campaignRepo)
 	signupHandler := handler.NewSignupHandler(campaignRepo, signupRepo)
 
 	// Router
 	r := gin.Default()
 
 	// Signup redirects
-	r.GET("/referrals/:id/signup", campaignHandler.CampaignSignupRedirect)
+	r.GET("/referrals/:id/signup", redirectHandler.CampaignSignupRedirect)
 
 	// API
 	v1 := r.Group("/referrals/api/v1")
