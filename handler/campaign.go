@@ -11,7 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// MaxAge is the max age value for campaign cookies
+// CookieName is the name for referral campaign cookies
+var CookieName string = "c-referrer"
+
+// MaxAge is the max age for referral campaign cookies
 var MaxAge int = 30 * 24 * 60 * 60
 
 // CampaignHandler is the http/json api for managing referral campaigns
@@ -34,8 +37,7 @@ func (self CampaignHandler) CampaignSignupRedirect(c *gin.Context) {
 		return
 	}
 	if campaign, err := self.campaignKeeper.GetCampaign(id); err == nil {
-		c.SetCookie(
-			"SignupReferral", fmt.Sprintf("%d", campaign.ID), MaxAge, path, domain, false, false)
+		c.SetCookie(CookieName, fmt.Sprintf("%d", campaign.ID), MaxAge, path, domain, false, false)
 	}
 	c.Redirect(http.StatusFound, location)
 }
