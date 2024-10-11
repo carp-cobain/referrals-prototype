@@ -2,6 +2,9 @@ package handler
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"os"
 	"strings"
 
 	"github.com/carp-cobain/referrals/keeper"
@@ -47,8 +50,23 @@ func (self CampaignHandler) GetCampaign(c *gin.Context) {
 		notFoundJson(c, err)
 		return
 	}
-	c.SetCookie("Campaign", fmt.Sprintf("%d", campaign.ID), MaxAge, "", "", false, false)
 	okJson(c, gin.H{"campaign": campaign})
+}
+
+// GET /campaigns/:id/signup
+// CampaignSignupRedirect drops a cookie and redirects the requestor to a signup URL.
+func (self CampaignHandler) CampaignSignupRedirect(c *gin.Context) {
+	location, path, domain := lookupSignupEnv()
+	id, err := uintParam(c, "id")
+	if err != nil {
+		c.Redirect(http.StatusFound, location)
+		return
+	}
+	if campaign, err := self.campaignKeeper.GetCampaign(id); err == nil {
+		c.SetCookie(
+			"SignupReferral", fmt.Sprintf("%d", campaign.ID), MaxAge, path, domain, false, false)
+	}
+	c.Redirect(http.StatusFound, location)
 }
 
 // POST /campaigns
@@ -69,7 +87,6 @@ func (self CampaignHandler) CreateCampaign(c *gin.Context) {
 		badRequestJson(c, err)
 		return
 	}
-	c.SetCookie("Campaign", fmt.Sprintf("%d", campaign.ID), MaxAge, "", "", false, false)
 	okJson(c, gin.H{"campaign": campaign})
 }
 
@@ -92,4 +109,21 @@ func (self CampaignRequest) Validate() (string, string, error) {
 		return "", "", fmt.Errorf("address must have prefix: tp")
 	}
 	return address, strings.TrimSpace(self.Name), nil
+}
+
+// Lookup signup redirect info from env var
+func lookupSignupEnv() (string, string, string) {
+	url, ok := os.LookupEnv("SIGNUP_URL")
+	if !ok {
+		log.Panicf("SIGNUP_URL not defined")
+	}
+	path, ok := os.LookupEnv("SIGNUP_COOKIE_PATH")
+	if !ok {
+		log.Panicf("SIGNUP_COOKIE_PATH not defined")
+	}
+	domain, ok := os.LookupEnv("SIGNUP_COOKIE_DOMAIN")
+	if !ok {
+		log.Panicf("SIGNUP_COOKIE_DOMAIN not defined")
+	}
+	return url, path, domain
 }
