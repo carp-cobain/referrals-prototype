@@ -24,6 +24,22 @@ func NewCampaignHandler(campaignKeeper keeper.CampaignKeeper) CampaignHandler {
 	return CampaignHandler{campaignKeeper}
 }
 
+// GET /referrals/:id/signup
+// CampaignSignupRedirect drops a cookie and redirects the requestor to a signup URL.
+func (self CampaignHandler) CampaignSignupRedirect(c *gin.Context) {
+	location, path, domain := lookupSignupEnv()
+	id, err := uintParam(c, "id")
+	if err != nil {
+		c.Redirect(http.StatusFound, location)
+		return
+	}
+	if campaign, err := self.campaignKeeper.GetCampaign(id); err == nil {
+		c.SetCookie(
+			"SignupReferral", fmt.Sprintf("%d", campaign.ID), MaxAge, path, domain, false, false)
+	}
+	c.Redirect(http.StatusFound, location)
+}
+
 // GET /campaigns
 // GetCampaigns gets a page of campaigns for an address
 func (self CampaignHandler) GetCampaigns(c *gin.Context) {
@@ -51,22 +67,6 @@ func (self CampaignHandler) GetCampaign(c *gin.Context) {
 		return
 	}
 	okJson(c, gin.H{"campaign": campaign})
-}
-
-// GET /campaigns/:id/signup
-// CampaignSignupRedirect drops a cookie and redirects the requestor to a signup URL.
-func (self CampaignHandler) CampaignSignupRedirect(c *gin.Context) {
-	location, path, domain := lookupSignupEnv()
-	id, err := uintParam(c, "id")
-	if err != nil {
-		c.Redirect(http.StatusFound, location)
-		return
-	}
-	if campaign, err := self.campaignKeeper.GetCampaign(id); err == nil {
-		c.SetCookie(
-			"SignupReferral", fmt.Sprintf("%d", campaign.ID), MaxAge, path, domain, false, false)
-	}
-	c.Redirect(http.StatusFound, location)
 }
 
 // POST /campaigns
