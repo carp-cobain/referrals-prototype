@@ -15,23 +15,27 @@ func main() {
 		gin.DisableConsoleColor()
 	}
 
+	// DB
 	readDB, writeDB, err := database.ConnectAndMigrate()
 	if err != nil {
 		log.Panicf("unable to connnect to db: %+v", err)
 	}
 
+	// Repos
 	campaignRepo := repo.NewCampaignRepo(readDB, writeDB)
 	signupRepo := repo.NewSignupRepo(readDB, writeDB)
 
+	// Handlers
 	campaignHandler := handler.NewCampaignHandler(campaignRepo)
-	redirectHandler := handler.NewRedirectHandler(campaignRepo)
+	redirectHandler := handler.NewRedirectHandler(campaignRepo, signupRepo)
 	signupHandler := handler.NewSignupHandler(campaignRepo, signupRepo)
 
 	// Router
 	r := gin.Default()
 
 	// Signup redirects
-	r.GET("/referrals/:id/signup", redirectHandler.CampaignSignupRedirect)
+	r.GET("/referrals", redirectHandler.Referrals)
+	r.GET("/referrals/:id/signup", redirectHandler.Signup)
 
 	// API
 	v1 := r.Group("/referrals/api/v1")
